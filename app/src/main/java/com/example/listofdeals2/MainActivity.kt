@@ -71,7 +71,6 @@ class MainActivity () : ComponentActivity() {
             "dealsDatabase"
         ).build()
         dao = db.dealDao()
-//        val deals: Array<Deal> = dealsDao.loadAllDeals()
         setContent{
             DealListApp(dao = dao)
         }
@@ -100,6 +99,14 @@ fun AddDeal(dao: DealsDao) {
     var newDealText by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
+
+    fun deleteDealButton(deal: Deal) { // понадобилась, тк не могу передать deals
+                                        // в следующую функцию
+        scope.launch {
+            dao.deleteDeal(deal)
+            deals = dao.loadAllDeals()
+        }
+    }
 
     LaunchedEffect(Unit) {
         deals = dao.loadAllDeals()
@@ -140,12 +147,6 @@ fun AddDeal(dao: DealsDao) {
             Text(text = "Add deal")
         }
     }
-    fun deleteDealButton(deal: Deal) {
-        scope.launch {
-            dao.deleteDeal(deal)
-            deals = dao.loadAllDeals()
-        }
-    }
     LazyColumn {
         items(deals) { deal ->
             CheckBoxDeals(dealText = deal.dealName, deals = deals, deal, dao,
@@ -155,26 +156,12 @@ fun AddDeal(dao: DealsDao) {
     }
 }
 
-//@Composable
-//fun ListOfDeals() {
-//    val dealList = listOf(
-//        "Погулять с собакой", "Помыть посуду", "Сделать уроки", "Убраться в комнате"
-//    )
-//    LazyColumn {
-//        items(dealList) { deal ->
-//            CheckBoxDeals(deal = deal)
-//        }
-//    }
-//}
-
 @Composable
 fun CheckBoxDeals(dealText: String, deals: List<Deal>, deal: Deal, dao: DealsDao,
                   deleteButton: (Deal) -> Unit) {
     var isCheckedState by remember {
         mutableStateOf(false)
     }
-
-    val scope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier.padding(8.dp),
@@ -194,10 +181,6 @@ fun CheckBoxDeals(dealText: String, deals: List<Deal>, deal: Deal, dao: DealsDao
             modifier = Modifier.weight(1f) // выстраивает строки задач красиво
         )
         IconButton(onClick = {
-//            scope.launch {
-//                dao.deleteDeal(deal)
-//                deals = dao.loadAllDeals()
-//            }
             deleteButton(deal)
         }) {
             Icon(
@@ -210,9 +193,6 @@ fun CheckBoxDeals(dealText: String, deals: List<Deal>, deal: Deal, dao: DealsDao
 
 @Composable
 fun DealListApp(dao: DealsDao) {
-//    var isCheckedState by remember {
-//        mutableStateOf(false)
-//    }
     Column(
         modifier = Modifier.fillMaxSize()
             .paint(
@@ -223,7 +203,6 @@ fun DealListApp(dao: DealsDao) {
     ) {
         Header()
         AddDeal(dao)
-//        ListOfDeals()
     }
 }
 
