@@ -1,16 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
 }
 
 android {
-    namespace = "com.example.listofdeals2"
+    namespace = "com.example.shoppinglist"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.listofdeals2"
+        applicationId = "com.example.shoppinglist"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -38,6 +39,9 @@ android {
 }
 
 dependencies {
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

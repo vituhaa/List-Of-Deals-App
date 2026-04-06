@@ -48,11 +48,20 @@ import androidx.compose.ui.unit.TextUnitType
 import com.example.listofdeals2.ui.theme.ListOfDeals2Theme
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
+import androidx.room.Room
+import com.example.listofdeals2.database.DealsDatabase
 
 class MainActivity : ComponentActivity() {
+    private lateinit var db: DealsDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        db = Room.databaseBuilder(
+            applicationContext,
+            DealsDatabase::class.java,
+            "dealsDatabase"
+        ).build()
+
         setContent {
             ListOfDealsPreview()
         }
