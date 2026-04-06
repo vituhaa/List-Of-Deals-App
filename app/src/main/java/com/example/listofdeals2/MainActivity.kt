@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
@@ -42,6 +43,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -121,22 +123,34 @@ fun AddDeal(dao: DealsDao) {
                 unfocusedTextColor = Color.Black
             )
         )
-        Button(onClick = {
-            if (newDealText.isNotBlank()) {
-                scope.launch {
-                    dao.insertDeal(Deal(dealName = newDealText))
-                    deals = dao.loadAllDeals()
-                    newDealText = ""
+        Button(
+            onClick = {
+                if (newDealText.isNotBlank()) {
+                    scope.launch {
+                        dao.insertDeal(Deal(dealName = newDealText))
+                        deals = dao.loadAllDeals()
+                        newDealText = ""
+                    }
                 }
-            }
-        }) {
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(id = R.color.lightpink),
+            )
+        ) {
             Text(text = "Add deal")
+        }
+    }
+    fun deleteDealButton(deal: Deal) {
+        scope.launch {
+            dao.deleteDeal(deal)
+            deals = dao.loadAllDeals()
         }
     }
     LazyColumn {
         items(deals) { deal ->
-            CheckBoxDeals(deal = deal.dealName)
-//            Text(deal.dealName)
+            CheckBoxDeals(dealText = deal.dealName, deals = deals, deal, dao,
+                deleteButton = { deal -> deleteDealButton(deal) }
+            )
         }
     }
 }
@@ -154,10 +168,14 @@ fun AddDeal(dao: DealsDao) {
 //}
 
 @Composable
-fun CheckBoxDeals(deal: String) {
+fun CheckBoxDeals(dealText: String, deals: List<Deal>, deal: Deal, dao: DealsDao,
+                  deleteButton: (Deal) -> Unit) {
     var isCheckedState by remember {
         mutableStateOf(false)
     }
+
+    val scope = rememberCoroutineScope()
+
     Row(
         modifier = Modifier.padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -166,16 +184,22 @@ fun CheckBoxDeals(deal: String) {
             checked = isCheckedState,
             onCheckedChange = { isCheckedState = it },
             colors = CheckboxDefaults.colors(
-                checkedColor = Color.Green,
+                checkedColor = colorResource(id = R.color.pink),
                 uncheckedColor = Color.DarkGray,
                 checkmarkColor = Color.White
             )
         )
         Text(
-            text = deal,
+            text = dealText,
             modifier = Modifier.weight(1f) // выстраивает строки задач красиво
         )
-        IconButton(onClick = {}) {
+        IconButton(onClick = {
+//            scope.launch {
+//                dao.deleteDeal(deal)
+//                deals = dao.loadAllDeals()
+//            }
+            deleteButton(deal)
+        }) {
             Icon(
                 painter = painterResource(id = R.drawable.baseline_delete_outline_24),
                 contentDescription = "Delete deal"
@@ -186,9 +210,9 @@ fun CheckBoxDeals(deal: String) {
 
 @Composable
 fun DealListApp(dao: DealsDao) {
-    var isCheckedState by remember {
-        mutableStateOf(false)
-    }
+//    var isCheckedState by remember {
+//        mutableStateOf(false)
+//    }
     Column(
         modifier = Modifier.fillMaxSize()
             .paint(
