@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.shoppinglist"
+    namespace = "com.example.listofdeals2"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.shoppinglist"
+        applicationId = "com.example.listofdeals2"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -39,9 +39,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

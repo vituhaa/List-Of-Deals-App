@@ -9,14 +9,14 @@ import androidx.room.Update
 @Dao
 interface DealsDao {
     @Insert
-    suspend fun insert(deal: Deal)
+    suspend fun insertDeal(deal: Deal)
 
     @Update
-    suspend fun updateUsers(deal: Deal)
+    suspend fun updateDeal(deal: Deal)
 
     @Delete
-    suspend fun deleteUsers(deal: Deal)
+    suspend fun deleteDeal(deal: Deal)
 
     @Query("SELECT * FROM deals")
-    suspend fun loadAllDeals(): Array<Deal>
+    suspend fun loadAllDeals(): List<Deal>
 }

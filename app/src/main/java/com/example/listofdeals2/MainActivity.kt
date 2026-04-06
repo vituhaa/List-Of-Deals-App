@@ -1,6 +1,6 @@
 package com.example.listofdeals2
 
-//import android.R
+import com.example.listofdeals2.R
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,13 +30,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -49,21 +53,25 @@ import com.example.listofdeals2.ui.theme.ListOfDeals2Theme
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import androidx.room.Room
+import com.example.listofdeals2.database.Deal
+import com.example.listofdeals2.database.DealsDao
 import com.example.listofdeals2.database.DealsDatabase
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
-    private lateinit var db: DealsDatabase
+class MainActivity () : ComponentActivity() {
+    private lateinit var dao: DealsDao
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        db = Room.databaseBuilder(
+        val db = Room.databaseBuilder(
             applicationContext,
             DealsDatabase::class.java,
             "dealsDatabase"
         ).build()
-
-        setContent {
-            ListOfDealsPreview()
+        dao = db.dealDao()
+//        val deals: Array<Deal> = dealsDao.loadAllDeals()
+        setContent{
+            DealListApp(dao = dao)
         }
     }
 }
@@ -71,7 +79,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Header() {
     Text(
-        text = "Список дел",
+        text = "Deals list",
         modifier = Modifier.padding(32.dp),
         style = TextStyle(
             color = Color.Black,
@@ -82,10 +90,19 @@ fun Header() {
 }
 
 @Composable
-fun AddDeal() {
-    var newDeal by remember {
-        mutableStateOf("")
+fun AddDeal(dao: DealsDao) {
+    var deals by remember {
+        mutableStateOf(emptyList<Deal>())
     }
+
+    var newDealText by remember { mutableStateOf("") }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        deals = dao.loadAllDeals()
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth()
             .padding(5.dp),
@@ -93,9 +110,9 @@ fun AddDeal() {
     )
     {
         OutlinedTextField(
-            value = newDeal,
+            value = newDealText,
             onValueChange = {
-                newDeal = it
+                newDealText = it
             },
             modifier = Modifier.width(250.dp)
                                .height(55.dp),
@@ -104,8 +121,21 @@ fun AddDeal() {
                 unfocusedTextColor = Color.Black
             )
         )
-        Button(onClick = {}) {
+        Button(onClick = {
+            if (newDealText.isNotBlank()) {
+                scope.launch {
+                    dao.insertDeal(Deal(dealName = newDealText))
+                    deals = dao.loadAllDeals()
+                    newDealText = ""
+                }
+            }
+        }) {
             Text(text = "Add deal")
+        }
+    }
+    LazyColumn {
+        items(deals) { deal ->
+            Text(deal.dealName)
         }
     }
 }
@@ -154,16 +184,20 @@ fun CheckBoxDeals(deal: String) {
 }
 
 @Composable
-fun DealListApp() {
+fun DealListApp(dao: DealsDao) {
     var isCheckedState by remember {
         mutableStateOf(false)
     }
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .paint(
+                painter = painterResource(id = R.drawable.background_image),
+                contentScale = ContentScale.Crop
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Header()
-        AddDeal()
+        AddDeal(dao)
         ListOfDeals()
     }
 }
@@ -246,10 +280,10 @@ fun DealListApp() {
 //    }
 //}
 
-@Preview(showBackground = true)
-@Composable
-fun ListOfDealsPreview() {
-    ListOfDeals2Theme {
-        DealListApp()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ListOfDealsPreview() {
+//    ListOfDeals2Theme {
+//        DealListApp()
+//    }
+//}
