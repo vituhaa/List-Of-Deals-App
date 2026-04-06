@@ -135,22 +135,23 @@ fun AddDeal(dao: DealsDao) {
     }
     LazyColumn {
         items(deals) { deal ->
-            Text(deal.dealName)
+            CheckBoxDeals(deal = deal.dealName)
+//            Text(deal.dealName)
         }
     }
 }
 
-@Composable
-fun ListOfDeals() {
-    val dealList = listOf(
-        "Погулять с собакой", "Помыть посуду", "Сделать уроки", "Убраться в комнате"
-    )
-    LazyColumn {
-        items(dealList) { deal ->
-            CheckBoxDeals(deal = deal)
-        }
-    }
-}
+//@Composable
+//fun ListOfDeals() {
+//    val dealList = listOf(
+//        "Погулять с собакой", "Помыть посуду", "Сделать уроки", "Убраться в комнате"
+//    )
+//    LazyColumn {
+//        items(dealList) { deal ->
+//            CheckBoxDeals(deal = deal)
+//        }
+//    }
+//}
 
 @Composable
 fun CheckBoxDeals(deal: String) {
@@ -198,87 +199,10 @@ fun DealListApp(dao: DealsDao) {
     ) {
         Header()
         AddDeal(dao)
-        ListOfDeals()
+//        ListOfDeals()
     }
 }
 
-//@Composable
-//fun ListOfDeals() {
-//    val dealList = listOf(
-//        "Погулять с собакой", "Помыть посуду", "Сделать уроки", "Убраться в комнате"
-//    )
-//
-//    var isCheckedState by remember {
-//        mutableStateOf(dealList.associateWith { false }.toMutableMap())
-//    }
-//
-//    var newDeal by remember {
-//        mutableStateOf("")
-//    }
-//
-//    Column(
-//        modifier = Modifier.fillMaxSize(),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Text(
-//            text = "Список дел",
-//            modifier = Modifier.padding(32.dp),
-//            style = TextStyle(
-//                color = Color.Black,
-//                fontSize = TextUnit(value = 24f, type = TextUnitType.Sp)
-//            ),
-//            fontWeight = FontWeight.ExtraBold
-//        )
-//        Row(
-//            modifier = Modifier.fillMaxWidth()
-//                .padding(5.dp),
-//            horizontalArrangement = Arrangement.SpaceEvenly
-//        )
-//        {
-//            OutlinedTextField(
-//                modifier = Modifier.weight(1f),
-//                value = newDeal,
-//                onValueChange = {
-//                    newDeal = it
-//            })
-//            Button(onClick = {}) {
-//                Text(text = "Add deal")
-//            }
-//        }
-//        LazyColumn {
-//            items(dealList) { deal ->
-//                Row(
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    modifier = Modifier.padding(8.dp)
-//                ) {
-//                    Checkbox(
-//                        checked = isCheckedState.getValue(deal),
-//                        onCheckedChange = { isChecked ->
-//                            isCheckedState = isCheckedState.toMutableMap().apply {
-//                                put(deal, isChecked)
-//                            }
-//                        },
-//                        colors = CheckboxDefaults.colors(
-//                            checkedColor = Color.Green,
-//                            uncheckedColor = Color.DarkGray,
-//                            checkmarkColor = Color.White
-//                        )
-//                    )
-//                    Text(
-//                        text = deal,
-//                        modifier = Modifier.weight(1f) // выстраивает строки задач красиво
-//                    )
-//                    IconButton(onClick = {}) {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.baseline_delete_outline_24),
-//                            contentDescription = "Delete deal"
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 //@Preview(showBackground = true)
 //@Composable
