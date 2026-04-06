@@ -1,16 +1,13 @@
 package com.example.listofdeals2
 
-import com.example.listofdeals2.R
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -26,12 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -42,18 +36,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
-import com.example.listofdeals2.ui.theme.ListOfDeals2Theme
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 import androidx.room.Room
 import com.example.listofdeals2.database.Deal
 import com.example.listofdeals2.database.DealsDao
@@ -81,12 +70,14 @@ class MainActivity () : ComponentActivity() {
 fun Header() {
     Text(
         text = "Deals list",
-        modifier = Modifier.padding(32.dp),
+        fontFamily = FontFamily.Cursive,
+        modifier = Modifier.padding(22.dp)
+            .padding(top = 22.dp),
         style = TextStyle(
             color = Color.Black,
-            fontSize = TextUnit(value = 24f, type = TextUnitType.Sp)
-        ),
-        fontWeight = FontWeight.ExtraBold
+            fontSize = 42.sp,
+            fontWeight = FontWeight.Bold
+        )
     )
 }
 
@@ -108,9 +99,10 @@ fun AddDeal(dao: DealsDao) {
         }
     }
 
-    LaunchedEffect(Unit) {
+    scope.launch {
         deals = dao.loadAllDeals()
     }
+
 
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -124,7 +116,7 @@ fun AddDeal(dao: DealsDao) {
                 newDealText = it
             },
             modifier = Modifier.width(250.dp)
-                               .height(55.dp),
+                               .height(48.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black
@@ -178,7 +170,12 @@ fun CheckBoxDeals(dealText: String, deals: List<Deal>, deal: Deal, dao: DealsDao
         )
         Text(
             text = dealText,
+            color = if (!isCheckedState) Color.Black else Color.White,
             modifier = Modifier.weight(1f) // выстраивает строки задач красиво
+                .background(colorResource(id = R.color.light2pink).copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(8.dp)
+                )
+                .padding(8.dp)
         )
         IconButton(onClick = {
             deleteButton(deal)
