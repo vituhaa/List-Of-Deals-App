@@ -99,6 +99,13 @@ fun AddDeal(dao: DealsDao) {
         }
     }
 
+    fun editDealButton(deal: Deal) {
+        scope.launch {
+            dao.updateDeal(deal)
+            deals = dao.loadAllDeals()
+        }
+    }
+
     scope.launch {
         deals = dao.loadAllDeals()
     }
@@ -141,16 +148,18 @@ fun AddDeal(dao: DealsDao) {
     }
     LazyColumn {
         items(deals) { deal ->
-            CheckBoxDeals(dealText = deal.dealName, deals = deals, deal, dao,
-                deleteButton = { deal -> deleteDealButton(deal) }
+            CheckBoxDeals(dealText = deal.dealName, deal,
+                deleteButton = { deal -> deleteDealButton(deal) },
+                editButton = { deal -> editDealButton(deal) }
             )
         }
     }
 }
 
 @Composable
-fun CheckBoxDeals(dealText: String, deals: List<Deal>, deal: Deal, dao: DealsDao,
-                  deleteButton: (Deal) -> Unit) {
+fun CheckBoxDeals(dealText: String, deal: Deal,
+                  deleteButton: (Deal) -> Unit,
+                  editButton: (Deal) -> Unit) {
     var isCheckedState by remember {
         mutableStateOf(false)
     }
@@ -177,6 +186,14 @@ fun CheckBoxDeals(dealText: String, deals: List<Deal>, deal: Deal, dao: DealsDao
                 )
                 .padding(8.dp)
         )
+        IconButton(onClick = {
+            editButton(deal)
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.pen),
+                contentDescription = "Edit deal"
+            )
+        }
         IconButton(onClick = {
             deleteButton(deal)
         }) {
