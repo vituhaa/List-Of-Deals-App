@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -25,7 +26,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -69,7 +72,7 @@ class MainActivity () : ComponentActivity() {
 @Composable
 fun Header() {
     Text(
-        text = "Deals list",
+        text = "Cases list",
         fontFamily = FontFamily.Cursive,
         modifier = Modifier.padding(22.dp)
             .padding(top = 22.dp),
@@ -106,7 +109,7 @@ fun AddDeal(dao: DealsDao) {
         }
     }
 
-    scope.launch {
+    LaunchedEffect(Unit) {
         deals = dao.loadAllDeals()
     }
 
@@ -149,8 +152,8 @@ fun AddDeal(dao: DealsDao) {
     LazyColumn {
         items(deals) { deal ->
             CheckBoxDeals(dealText = deal.dealName, deal,
-                deleteButton = { deal -> deleteDealButton(deal) },
-                editButton = { deal -> editDealButton(deal) }
+                deleteButton = { deleteDealButton(it) },
+                editButton = { editDealButton(it) }
             )
         }
     }
@@ -163,6 +166,8 @@ fun CheckBoxDeals(dealText: String, deal: Deal,
     var isCheckedState by remember {
         mutableStateOf(false)
     }
+
+    var showEditWindow by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier.padding(8.dp),
@@ -187,7 +192,7 @@ fun CheckBoxDeals(dealText: String, deal: Deal,
                 .padding(8.dp)
         )
         IconButton(onClick = {
-            editButton(deal)
+            showEditWindow = true
         }) {
             Icon(
                 painter = painterResource(id = R.drawable.pen),
@@ -203,7 +208,49 @@ fun CheckBoxDeals(dealText: String, deal: Deal,
             )
         }
     }
+
+    if (showEditWindow) {
+        var editText by remember { mutableStateOf(deal.dealName) }
+        AlertDialog(
+            onDismissRequest = { showEditWindow = false },
+            title = {
+                Text(
+                    text = "Edit case",
+                    fontFamily = FontFamily.Cursive,
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontSize = 42.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )},
+            text = {
+                OutlinedTextField(
+                    value = editText,
+                    onValueChange = {
+                        editText = it
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    editButton(deal.copy(dealName = editText))
+                    showEditWindow = false
+                }) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showEditWindow = false
+                }) {
+                    Text("Cancel")
+                }
+            },
+            containerColor = colorResource(id = R.color.alertback)
+        )
+    }
 }
+
 
 @Composable
 fun DealListApp(dao: DealsDao) {
@@ -219,7 +266,6 @@ fun DealListApp(dao: DealsDao) {
         AddDeal(dao)
     }
 }
-
 
 //@Preview(showBackground = true)
 //@Composable
